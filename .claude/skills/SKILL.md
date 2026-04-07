@@ -14,6 +14,9 @@ allowed-tools:
 
 Manage content on any Payload CMS instance directly from the terminal.
 
+Requires the `pcms` CLI: `npm install -g pcms-cli`
+Source and docs: https://github.com/mirkobozzetto/pcms-cli
+
 ## Prerequisites
 
 - `pcms` installed globally (`npm install -g pcms-cli`)
