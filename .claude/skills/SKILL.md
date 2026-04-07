@@ -1,6 +1,6 @@
 ---
 name: pcms
-description: "Manage Payload CMS content via the pcms CLI. Use when user mentions 'pcms', 'payload', 'create post', 'import article', 'publish post', 'list posts', 'upload media', 'manage content', 'draft', 'blog post', 'export article', 'import markdown', 'content pipeline', 'create draft', 'unpublish', 'list drafts', 'versions', 'globals', or wants to interact with a Payload CMS instance from the terminal."
+description: "Create posts, import markdown, publish, upload media, and manage content on any Payload CMS instance — directly from Claude Code. Full CRUD, versioning, search, globals. Requires pcms-cli (npm install -g pcms-cli). Use when user mentions 'pcms', 'payload', 'create post', 'import article', 'publish post', 'list posts', 'upload media', 'draft', 'blog post', 'export article', 'content pipeline', 'versions', 'globals'."
 argument-hint: "<action> [options] — e.g. 'create a draft post about AI law' or 'list published posts'"
 allowed-tools:
   - Bash
