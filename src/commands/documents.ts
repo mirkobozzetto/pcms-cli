@@ -1,24 +1,9 @@
-import { readFileSync } from 'node:fs'
 import type { Command } from 'commander'
-import { PayloadAPI } from '../lib/api.js'
-import { getDefaultDomain, getProfile } from '../lib/config.js'
+import { readFileSync } from 'node:fs'
+import { markdownToLexical, parseFrontmatter } from '../lib/markdown.js'
 import { printError, printJson, printSuccess } from '../lib/output.js'
 import { promptText } from '../lib/prompt.js'
-import { parseFrontmatter, markdownToLexical } from '../lib/markdown.js'
-
-async function resolveAPI(opts: { domain?: string }): Promise<PayloadAPI> {
-  const domain = opts.domain ?? getDefaultDomain()
-  if (domain === null) {
-    throw new Error('No domain specified and no default domain configured')
-  }
-  const profile = getProfile(domain)
-  if (profile === null) {
-    throw new Error(`No profile found for domain: ${domain}`)
-  }
-  const api = new PayloadAPI(domain)
-  await api.login(profile.email, profile.password)
-  return api
-}
+import { resolveAPI } from './auth.js'
 
 interface ListOptions {
   domain?: string
@@ -93,7 +78,7 @@ export function registerDocumentCommands(program: Command): void {
 
   docs
     .command('list <collection>')
-    .description("List documents in a collection")
+    .description('List documents in a collection')
     .option('-d, --domain <domain>', 'Payload CMS domain URL')
     .option('--where <where>', 'JSON or where string filter')
     .option('--sort <sort>', 'Sort field (e.g., -createdAt)')

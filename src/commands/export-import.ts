@@ -1,25 +1,10 @@
-import * as fs from 'node:fs'
 import type { Command } from 'commander'
-import { PayloadAPI } from '../lib/api.js'
-import { getDefaultDomain, getProfile } from '../lib/config.js'
+import * as fs from 'node:fs'
 import { lexicalToMarkdown, markdownToLexical, parseFrontmatter } from '../lib/markdown.js'
 import { printError, printSuccess } from '../lib/output.js'
-import type { LexicalDocument } from '../types/lexical.js'
 import type { PayloadDocument } from '../types/api.js'
-
-async function resolveAPI(opts: { domain?: string }): Promise<PayloadAPI> {
-  const domain = opts.domain ?? getDefaultDomain()
-  if (domain === null) {
-    throw new Error('No domain specified and no default domain configured')
-  }
-  const profile = getProfile(domain)
-  if (profile === null) {
-    throw new Error(`No profile found for domain: ${domain}`)
-  }
-  const api = new PayloadAPI(domain)
-  await api.login(profile.email, profile.password)
-  return api
-}
+import type { LexicalDocument } from '../types/lexical.js'
+import { resolveAPI } from './auth.js'
 
 type ExportFormat = 'json' | 'md'
 

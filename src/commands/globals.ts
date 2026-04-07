@@ -1,20 +1,6 @@
 import type { Command } from 'commander'
-import { PayloadAPI } from '../lib/api.js'
-import { getProfile } from '../lib/config.js'
 import { printError, printJson, printSuccess } from '../lib/output.js'
-
-function resolveAPI(domain: string | undefined): PayloadAPI {
-  const profile = getProfile(domain)
-  if (!profile) {
-    printError(
-      domain
-        ? `Profile not found for domain: ${domain}`
-        : "No default profile configured. Use `pcms auth login` first.",
-    )
-    process.exit(1)
-  }
-  return new PayloadAPI(profile.domain, profile.password)
-}
+import { resolveAPI } from './auth.js'
 
 export function registerGlobalCommands(program: Command): void {
   program
@@ -28,23 +14,28 @@ export function registerGlobalCommands(program: Command): void {
         slug: string | undefined,
         options: { depth?: string; locale?: string; domain?: string },
       ): Promise<void> => {
-        const api = resolveAPI(options.domain)
-        if (slug !== undefined) {
-          const params: { depth?: number; locale?: string } = {}
-          if (options.depth !== undefined) params.depth = parseInt(options.depth, 10)
-          if (options.locale !== undefined) params.locale = options.locale
-          const result = await api.getGlobal(slug, params)
-          printJson(result)
-        } else {
-          const access = await api.getAccess()
-          const slugs = Object.keys(access.globals)
-          if (slugs.length === 0) {
-            printSuccess('No accessible globals.')
-            return
+        try {
+          const api = await resolveAPI(options.domain ? { domain: options.domain } : {})
+          if (slug !== undefined) {
+            const params: { depth?: number; locale?: string } = {}
+            if (options.depth !== undefined) params.depth = parseInt(options.depth, 10)
+            if (options.locale !== undefined) params.locale = options.locale
+            const result = await api.getGlobal(slug, params)
+            printJson(result)
+          } else {
+            const access = await api.getAccess()
+            const slugs = Object.keys(access.globals)
+            if (slugs.length === 0) {
+              printSuccess('No accessible globals.')
+              return
+            }
+            for (const name of slugs) {
+              printSuccess(name)
+            }
           }
-          for (const name of slugs) {
-            printSuccess(name)
-          }
+        } catch (err) {
+          printError(err instanceof Error ? err.message : String(err))
+          process.exit(1)
         }
       },
     )
@@ -61,19 +52,24 @@ export function registerGlobalCommands(program: Command): void {
         slug: string,
         options: { data: string; locale?: string; depth?: string; domain?: string },
       ): Promise<void> => {
-        const api = resolveAPI(options.domain)
-        let data: Record<string, unknown>
         try {
-          data = JSON.parse(options.data) as Record<string, unknown>
-        } catch {
-          printError('The --data parameter must be valid JSON.')
+          const api = await resolveAPI(options.domain ? { domain: options.domain } : {})
+          let data: Record<string, unknown>
+          try {
+            data = JSON.parse(options.data) as Record<string, unknown>
+          } catch {
+            printError('The --data parameter must be valid JSON.')
+            process.exit(1)
+          }
+          const params: { locale?: string; depth?: number } = {}
+          if (options.locale !== undefined) params.locale = options.locale
+          if (options.depth !== undefined) params.depth = parseInt(options.depth, 10)
+          const result = await api.updateGlobal(slug, data, params)
+          printJson(result)
+        } catch (err) {
+          printError(err instanceof Error ? err.message : String(err))
           process.exit(1)
         }
-        const params: { locale?: string; depth?: number } = {}
-        if (options.locale !== undefined) params.locale = options.locale
-        if (options.depth !== undefined) params.depth = parseInt(options.depth, 10)
-        const result = await api.updateGlobal(slug, data, params)
-        printJson(result)
       },
     )
 }

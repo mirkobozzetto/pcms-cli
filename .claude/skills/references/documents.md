@@ -115,15 +115,15 @@ pcms global:update <slug> --data '{"key":"value"}'  # update a global
 
 ## Where clause syntax
 
-| Operator | Syntax | Example |
-|---|---|---|
-| equals | `field[equals]=value` | `status[equals]=published` |
-| not equals | `field[not_equals]=value` | `status[not_equals]=draft` |
-| greater than | `field[greater_than]=value` | `views[greater_than]=100` |
-| less than | `field[less_than]=value` | `views[less_than]=50` |
-| like (contains) | `field[like]=value` | `title[like]=payload` |
-| exists | `field[exists]=true` | `publishedAt[exists]=true` |
-| in | `field[in]=a,b` | `status[in]=draft,review` |
+| Operator        | Syntax                      | Example                    |
+| --------------- | --------------------------- | -------------------------- |
+| equals          | `field[equals]=value`       | `status[equals]=published` |
+| not equals      | `field[not_equals]=value`   | `status[not_equals]=draft` |
+| greater than    | `field[greater_than]=value` | `views[greater_than]=100`  |
+| less than       | `field[less_than]=value`    | `views[less_than]=50`      |
+| like (contains) | `field[like]=value`         | `title[like]=payload`      |
+| exists          | `field[exists]=true`        | `publishedAt[exists]=true` |
+| in              | `field[in]=a,b`             | `status[in]=draft,review`  |
 
 Combine with `&`:
 

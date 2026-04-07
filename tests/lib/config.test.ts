@@ -35,7 +35,7 @@ describe('config — real filesystem', () => {
     setProfile({
       domain: 'https://example.com',
       email: 'test@test.com',
-      password: 'secret',
+      token: 'secret',
     })
 
     const configPath = getConfigPath()
@@ -50,7 +50,7 @@ describe('config — real filesystem', () => {
     setProfile({
       domain: 'https://example.com',
       email: 'test@test.com',
-      password: 'secret',
+      token: 'secret',
     })
 
     const profile = getProfile('https://example.com')
@@ -62,30 +62,30 @@ describe('config — real filesystem', () => {
     setProfile({
       domain: 'https://example.com',
       email: 'test@test.com',
-      password: 'secret',
+      token: 'secret',
     })
 
     expect(getProfile('https://unknown.com')).toBeNull()
   })
 
   it('getDefaultDomain returns the last set profile domain', () => {
-    setProfile({ domain: 'https://a.com', email: 'a@a.com', password: 'a' })
-    setProfile({ domain: 'https://b.com', email: 'b@b.com', password: 'b' })
+    setProfile({ domain: 'https://a.com', email: 'a@a.com', token: 'a' })
+    setProfile({ domain: 'https://b.com', email: 'b@b.com', token: 'b' })
 
     expect(getDefaultDomain()).toBe('https://b.com')
   })
 
   it('listProfiles returns all saved profiles', () => {
-    setProfile({ domain: 'https://a.com', email: 'a@a.com', password: 'a' })
-    setProfile({ domain: 'https://b.com', email: 'b@b.com', password: 'b' })
+    setProfile({ domain: 'https://a.com', email: 'a@a.com', token: 'a' })
+    setProfile({ domain: 'https://b.com', email: 'b@b.com', token: 'b' })
 
     const profiles = listProfiles()
     expect(profiles).toHaveLength(2)
   })
 
   it('removeProfile deletes a profile and updates default', () => {
-    setProfile({ domain: 'https://a.com', email: 'a@a.com', password: 'a' })
-    setProfile({ domain: 'https://b.com', email: 'b@b.com', password: 'b' })
+    setProfile({ domain: 'https://a.com', email: 'a@a.com', token: 'a' })
+    setProfile({ domain: 'https://b.com', email: 'b@b.com', token: 'b' })
 
     removeProfile('https://b.com')
 
@@ -94,14 +94,14 @@ describe('config — real filesystem', () => {
   })
 
   it('removeProfile sets default to null when removing last profile', () => {
-    setProfile({ domain: 'https://a.com', email: 'a@a.com', password: 'a' })
+    setProfile({ domain: 'https://a.com', email: 'a@a.com', token: 'a' })
     removeProfile('https://a.com')
 
     expect(getDefaultDomain()).toBeNull()
   })
 
   it('getProfile with no args returns default profile', () => {
-    setProfile({ domain: 'https://a.com', email: 'a@a.com', password: 'a' })
+    setProfile({ domain: 'https://a.com', email: 'a@a.com', token: 'a' })
 
     const profile = getProfile()
     expect(profile?.domain).toBe('https://a.com')

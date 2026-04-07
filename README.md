@@ -2,16 +2,46 @@
 
 A CLI to control [Payload CMS](https://payloadcms.com) from the terminal.
 
-I built this because I wanted to manage my Payload content without opening the admin panel every time. The main use case: generating blog posts programmatically from Claude Code or any script, pushing drafts, publishing, importing markdown files — all from the command line.
+I built this because I needed to create blog posts, push drafts, and manage content on my Payload instances without opening the admin panel. I use it mainly through Claude Code — I tell it what I want in plain language and it handles the rest. But it works just as well from a regular shell, a script, or any CI pipeline.
 
-It wraps the Payload REST API in a single `pcms` command. Nothing fancy, just every endpoint Payload exposes, accessible from your shell.
+## Quick examples
 
-## Why
+```bash
+# Import a markdown article as a draft
+pcms import ./article.md --collection posts
 
-- Write an article in markdown, `pcms import` it as a draft, review in the admin, publish with `pcms publish`
-- Script content creation from Claude Code or any automation tool
-- Manage multiple Payload instances from one place (staging, prod, etc.)
-- Quick lookups without loading the admin UI — list posts, check a document, inspect a schema
+# List published posts
+pcms documents list posts --where 'status[equals]=published' --sort '-publishedAt'
+
+# Publish a draft
+pcms publish posts 42
+
+# Upload an image
+pcms media upload ./hero.jpg --alt "Article cover"
+
+# Export a post back to markdown
+pcms export posts 42 -f md -o ./backup.md
+```
+
+## Claude Code Skill
+
+The repo includes a Claude Code skill (`.claude/skills/`). This is how I use pcms day-to-day — through natural language inside Claude Code:
+
+```
+/pcms create a draft post about AI hallucinations in legal tech
+/pcms list my drafts
+/pcms import all the markdown files in ./articles/
+/pcms publish posts 42
+/pcms how many published posts do I have
+```
+
+The skill figures out the right `pcms` command, checks your auth, runs it, and formats the output. It ships with reference docs for every feature.
+
+To install the skill after cloning:
+
+```bash
+ln -s /path/to/pcms-cli/.claude/skills ~/.claude/skills/pcms
+```
 
 ## Install
 
@@ -26,92 +56,91 @@ From source:
 ```bash
 git clone https://github.com/mirkobozzetto/pcms-cli.git
 cd pcms-cli
-pnpm install
-pnpm build
-pnpm link --global
+pnpm install && pnpm build && pnpm link --global
 ```
 
 Needs Node.js 18+.
 
-## Getting started
+## Setup
 
 ```bash
-# Login to your Payload instance
-pcms auth login --domain https://your-site.com --email admin@your-site.com
+pcms auth login --domain https://your-site.com --email admin@your-site.com --password 'yourpassword'
 
-# See what's there
+# Check it works
 pcms collections
-pcms documents list posts --limit 5
-
-# Create a draft from a markdown file
-pcms import ./my-article.md --collection posts
-
-# Or create directly
-pcms documents create posts --title "Hello" --status draft
-
-# Publish when ready
-pcms publish posts 42
 ```
+
+If you're in an interactive terminal, you can omit `--password` and it will be prompted with hidden input. From scripts or Claude Code, always pass `--password` explicitly.
+
+Supports multiple instances — just `pcms auth login` again with a different domain. The last one becomes the default, or use `--domain` on any command.
 
 ## Commands
 
-### Auth
+### Content lifecycle
+
+The typical flow: create → review → publish.
 
 ```bash
-pcms auth login [--domain <url>] [--email <email>] [--password <pass>]
-pcms auth status
-pcms auth me
-pcms auth logout [--domain <url>]
-pcms auth profiles
-```
+# Create from a markdown file (best for articles)
+pcms import ./article.md --collection posts --status draft
 
-Credentials are stored in `~/.config/pcms/credentials.json`. Supports multiple profiles for different Payload instances.
+# Or create inline
+pcms documents create posts --title "My Post" --status draft --excerpt "Short desc"
 
-### Collections
+# Or from raw JSON
+pcms documents create posts --data '{"title":"My Post","status":"draft","category":1}'
 
-```bash
-pcms collections                              # list all collections
-pcms collections schema <collection>          # show fields and types
-pcms collections count <collection> [--where] # count documents
-```
+# Check your drafts
+pcms documents list posts --where 'status[equals]=draft' --limit 10
 
-### Documents
+# Read a specific post
+pcms documents get posts 42
 
-```bash
-pcms documents list <collection> [--where --sort --limit --page --depth --locale]
-pcms documents get <collection> <id> [--depth --locale]
-pcms documents create <collection> [--data <json> | --md --input <file> | --title --content --status --slug --excerpt]
-pcms documents update <collection> <id> [--data <json> | --title --status ...]
-pcms documents delete <collection> <id> [--force]
-```
+# Edit it
+pcms documents update posts 42 --title "Better Title" --excerpt "Updated"
 
-### Publishing
+# Publish
+pcms publish posts 42
 
-```bash
-pcms publish <collection> <id> [--status-field <field> --value <value>]
-pcms unpublish <collection> <id> [--status-field <field> --value <value>]
+# Changed your mind
+pcms unpublish posts 42
+
+# Delete (asks confirmation, use --force to skip)
+pcms documents delete posts 42
 ```
 
 ### Media
 
 ```bash
-pcms media upload <file> [--alt <text> --locale <code>]
+pcms media upload ./image.jpg --alt "Description for accessibility"
+# returns the media ID — use it in document creation
 ```
 
 ### Search
 
 ```bash
-pcms search <query> [--limit --page]
+pcms search "keyword" --limit 10
 ```
+
+Requires the Payload Search plugin.
 
 ### Export / Import
 
 ```bash
-pcms export <collection> <id> [-f json|md] [-o <file>]
-pcms import <file> [-c <collection>] [--status draft]
+# Export to markdown (with frontmatter)
+pcms export posts 42 -f md -o ./post.md
+
+# Export to JSON
+pcms export posts 42 -f json -o ./post.json
+
+# Import markdown with frontmatter
+pcms import ./article.md --collection posts --status draft
+
+# Batch import a folder
+for f in ./articles/*.md; do pcms import "$f" --collection posts; done
 ```
 
-Export to markdown or JSON. Import from markdown with YAML frontmatter:
+Markdown format for import:
 
 ```markdown
 ---
@@ -121,67 +150,91 @@ excerpt: 'Short description'
 status: 'draft'
 ---
 
-Article content in markdown. Headings, bold, italic, links, lists, code blocks — all converted to Payload's Lexical format.
+Content here. Supports headings, **bold**, _italic_, `code`, [links](url),
+lists, code blocks, blockquotes — all converted to Payload's Lexical format.
+```
+
+### Collections info
+
+```bash
+pcms collections                                    # list all
+pcms collections schema posts                       # show fields and types
+pcms collections count posts                        # total count
+pcms collections count posts --where 'status[equals]=published'
 ```
 
 ### Versions
 
 ```bash
-pcms versions <collection> <id> [--limit --page]
-pcms version <collection> <versionId> [--depth]
-pcms restore <collection> <versionId>
+pcms versions posts 42                  # list version history
+pcms version posts <versionId>          # inspect a version
+pcms restore posts <versionId>          # roll back
 ```
 
 ### Globals
 
 ```bash
-pcms globals [slug] [--depth --locale]
-pcms global:update <slug> --data <json> [--locale --depth]
+pcms globals                            # list globals
+pcms globals navigation                 # read one
+pcms global:update nav --data '{"items":[{"label":"Home","url":"/"}]}'
+```
+
+### Auth management
+
+```bash
+pcms auth status          # current profile
+pcms auth me              # user details from the API
+pcms auth profiles        # all saved profiles
+pcms auth logout           # remove current profile
 ```
 
 ## Where clause
 
-The `--where` option passes through to Payload's REST API:
+Filter documents with Payload's query syntax:
 
 ```bash
 pcms documents list posts --where 'status[equals]=published'
-pcms documents list posts --where 'title[like]=payload&status[equals]=draft'
+pcms documents list posts --where 'title[like]=juridique&status[not_equals]=draft'
 pcms collections count posts --where 'publishedAt[exists]=true'
 ```
 
-Operators: `equals`, `not_equals`, `greater_than`, `less_than`, `like`, `contains`, `in`, `not_in`, `exists`.
+| Operator       | Example                    |
+| -------------- | -------------------------- |
+| `equals`       | `status[equals]=published` |
+| `not_equals`   | `status[not_equals]=draft` |
+| `greater_than` | `views[greater_than]=100`  |
+| `less_than`    | `views[less_than]=50`      |
+| `like`         | `title[like]=keyword`      |
+| `exists`       | `publishedAt[exists]=true` |
+| `in`           | `status[in]=draft,review`  |
 
 ## Stack
 
-- TypeScript (strict, no `any`)
-- Commander.js for CLI parsing
-- Native `fetch` (Node 18+)
-- Zero runtime dependencies beyond Commander
-- Vitest for tests
+- TypeScript 6 (strict, zero `any`)
+- Commander.js
+- Native fetch (Node 18+)
+- Single runtime dependency
+- Vitest 4 for tests
 
 ## Development
 
 ```bash
 pnpm install
-pnpm build       # compile to dist/
-pnpm test        # run tests
-pnpm typecheck   # check types
-pnpm format      # format with prettier
-pnpm check       # typecheck + lint + test
+pnpm build        # compile to dist/
+pnpm test         # vitest
+pnpm typecheck    # tsc --noEmit
+pnpm format       # prettier
+pnpm check        # all of the above
 ```
 
 ## Contributing
 
-Open an issue first. Then:
+Open an issue first. Then fork, branch, `pnpm check`, PR.
 
-1. Fork the repo
-2. Create your branch (`git checkout -b feat/my-feature`)
-3. Make sure `pnpm check` passes
-4. Open a PR
+## Links
 
-## API Reference
-
-This CLI wraps the [Payload REST API](https://payloadcms.com/docs/rest-api/overview). Every endpoint is supported.
+- [Payload CMS](https://payloadcms.com)
+- [Payload REST API docs](https://payloadcms.com/docs/rest-api/overview)
 
 ## License
 

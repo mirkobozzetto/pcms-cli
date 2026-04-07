@@ -28,6 +28,15 @@ export class PayloadAPI {
     this.token = token
   }
 
+  getToken(): string {
+    if (this.token === undefined) throw new Error('Not authenticated')
+    return this.token
+  }
+
+  getDomain(): string {
+    return this.baseUrl
+  }
+
   private authHeaders(): Record<string, string> {
     if (this.token) {
       return { Authorization: `JWT ${this.token}` }

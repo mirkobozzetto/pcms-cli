@@ -26,26 +26,26 @@ Manage content on any Payload CMS instance directly from the terminal.
 
 ## Argument Routing
 
-| User says | Action | Reference |
-|---|---|---|
-| `init`, `setup`, `configure` | Setup guide — install + auth | (inline below) |
-| `help`, `commands`, `reference` | Show quick reference | (inline below) |
-| `create`, `new post`, `draft`, `write article` | Create document | [references/documents.md](references/documents.md) |
-| `list`, `show posts`, `drafts`, `published` | List/query documents | [references/documents.md](references/documents.md) |
-| `get`, `show`, `read post` | Get single document | [references/documents.md](references/documents.md) |
-| `update`, `edit`, `modify` | Update document | [references/documents.md](references/documents.md) |
-| `delete`, `remove` | Delete document | [references/documents.md](references/documents.md) |
-| `publish`, `unpublish` | Change publication status | [references/documents.md](references/documents.md) |
-| `import`, `import markdown` | Import markdown file as document | [references/content-workflows.md](references/content-workflows.md) |
-| `export` | Export document to JSON or markdown | [references/content-workflows.md](references/content-workflows.md) |
-| `upload`, `image`, `media` | Upload media file | [references/media.md](references/media.md) |
-| `search` | Search content | [references/documents.md](references/documents.md) |
-| `versions`, `restore` | Document version history | [references/documents.md](references/documents.md) |
-| `globals` | Read/update globals | [references/documents.md](references/documents.md) |
-| `collections`, `schema`, `count` | Collection metadata | [references/documents.md](references/documents.md) |
-| `batch import`, `import folder` | Batch content import | [references/content-workflows.md](references/content-workflows.md) |
-| `generate`, `write about` | Generate content + import | [references/content-workflows.md](references/content-workflows.md) |
-| `login`, `logout`, `auth`, `profiles` | Authentication | [references/auth.md](references/auth.md) |
+| User says                                      | Action                              | Reference                                                          |
+| ---------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------ |
+| `init`, `setup`, `configure`                   | Setup guide — install + auth        | (inline below)                                                     |
+| `help`, `commands`, `reference`                | Show quick reference                | (inline below)                                                     |
+| `create`, `new post`, `draft`, `write article` | Create document                     | [references/documents.md](references/documents.md)                 |
+| `list`, `show posts`, `drafts`, `published`    | List/query documents                | [references/documents.md](references/documents.md)                 |
+| `get`, `show`, `read post`                     | Get single document                 | [references/documents.md](references/documents.md)                 |
+| `update`, `edit`, `modify`                     | Update document                     | [references/documents.md](references/documents.md)                 |
+| `delete`, `remove`                             | Delete document                     | [references/documents.md](references/documents.md)                 |
+| `publish`, `unpublish`                         | Change publication status           | [references/documents.md](references/documents.md)                 |
+| `import`, `import markdown`                    | Import markdown file as document    | [references/content-workflows.md](references/content-workflows.md) |
+| `export`                                       | Export document to JSON or markdown | [references/content-workflows.md](references/content-workflows.md) |
+| `upload`, `image`, `media`                     | Upload media file                   | [references/media.md](references/media.md)                         |
+| `search`                                       | Search content                      | [references/documents.md](references/documents.md)                 |
+| `versions`, `restore`                          | Document version history            | [references/documents.md](references/documents.md)                 |
+| `globals`                                      | Read/update globals                 | [references/documents.md](references/documents.md)                 |
+| `collections`, `schema`, `count`               | Collection metadata                 | [references/documents.md](references/documents.md)                 |
+| `batch import`, `import folder`                | Batch content import                | [references/content-workflows.md](references/content-workflows.md) |
+| `generate`, `write about`                      | Generate content + import           | [references/content-workflows.md](references/content-workflows.md) |
+| `login`, `logout`, `auth`, `profiles`          | Authentication                      | [references/auth.md](references/auth.md)                           |
 
 When the user's intent is ambiguous, ask before executing.
 

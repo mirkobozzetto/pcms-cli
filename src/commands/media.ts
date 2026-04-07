@@ -1,20 +1,6 @@
 import type { Command } from 'commander'
-import { PayloadAPI } from '../lib/api.js'
-import { getProfile } from '../lib/config.js'
 import { printError, printSuccess } from '../lib/output.js'
-
-function resolveAPI(domain: string | undefined): PayloadAPI {
-  const profile = getProfile(domain)
-  if (!profile) {
-    printError(
-      domain
-        ? `Profile not found for domain: ${domain}`
-        : "No default profile configured. Use `pcms auth login` first.",
-    )
-    process.exit(1)
-  }
-  return new PayloadAPI(profile.domain, profile.password)
-}
+import { resolveAPI } from './auth.js'
 
 export function registerMediaCommands(program: Command): void {
   const media = program.command('media').description('Manage Payload CMS media')
@@ -31,7 +17,7 @@ export function registerMediaCommands(program: Command): void {
         options: { alt?: string; locale?: string; domain?: string },
       ): Promise<void> => {
         try {
-          const api = resolveAPI(options.domain)
+          const api = await resolveAPI(options.domain ? { domain: options.domain } : {})
           const result = await api.upload(file, {
             alt: options.alt,
             locale: options.locale,

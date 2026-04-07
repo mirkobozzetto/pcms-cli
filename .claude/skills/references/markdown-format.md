@@ -4,21 +4,21 @@
 
 ```yaml
 ---
-title: "Article Title"
-slug: "article-slug"
-excerpt: "Short description for SEO and listing pages"
-status: "draft"
-publishedAt: "2026-04-07T10:00:00.000Z"
+title: 'Article Title'
+slug: 'article-slug'
+excerpt: 'Short description for SEO and listing pages'
+status: 'draft'
+publishedAt: '2026-04-07T10:00:00.000Z'
 ---
 ```
 
-| Field | Required | Description |
-|---|---|---|
-| title | yes | Document title |
-| slug | no | URL slug (auto-generated from title if omitted) |
-| excerpt | no | Short description |
-| status | no | draft, review, or published (defaults to draft) |
-| publishedAt | no | ISO date string, auto-set on publish if omitted |
+| Field       | Required | Description                                     |
+| ----------- | -------- | ----------------------------------------------- |
+| title       | yes      | Document title                                  |
+| slug        | no       | URL slug (auto-generated from title if omitted) |
+| excerpt     | no       | Short description                               |
+| status      | no       | draft, review, or published (defaults to draft) |
+| publishedAt | no       | ISO date string, auto-set on publish if omitted |
 
 ## Body format
 
@@ -26,28 +26,28 @@ Standard markdown. Converted to Payload's Lexical rich text format on import.
 
 Supported elements:
 
-| Markdown | Lexical node |
-|---|---|
-| `# Heading` | HeadingNode (h1-h6) |
-| `Regular text` | ParagraphNode |
-| `**bold**` | TextNode format=bold |
-| `*italic*` | TextNode format=italic |
-| `` `code` `` | TextNode format=code |
-| `[text](url)` | LinkNode |
-| `- item` | ListNode (bullet) |
-| `1. item` | ListNode (number) |
-| ` ```lang ``` ` | CodeNode |
-| `> quote` | QuoteNode |
-| `---` | HorizontalRuleNode |
+| Markdown        | Lexical node           |
+| --------------- | ---------------------- |
+| `# Heading`     | HeadingNode (h1-h6)    |
+| `Regular text`  | ParagraphNode          |
+| `**bold**`      | TextNode format=bold   |
+| `*italic*`      | TextNode format=italic |
+| `` `code` ``    | TextNode format=code   |
+| `[text](url)`   | LinkNode               |
+| `- item`        | ListNode (bullet)      |
+| `1. item`       | ListNode (number)      |
+| ` ```lang ``` ` | CodeNode               |
+| `> quote`       | QuoteNode              |
+| `---`           | HorizontalRuleNode     |
 
 ## Example article
 
 ```markdown
 ---
-title: "Hallucinations IA juridique : risques pour les avocats"
-slug: "hallucinations-ia-juridique"
+title: 'Hallucinations IA juridique : risques pour les avocats'
+slug: 'hallucinations-ia-juridique'
 excerpt: "Stanford a documenté 17-33% d'erreurs chez les leaders du marché"
-status: "draft"
+status: 'draft'
 ---
 
 # Les hallucinations IA dans le domaine juridique

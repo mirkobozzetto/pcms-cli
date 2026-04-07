@@ -1,11 +1,7 @@
-/**
- * Configuration and credential types for pcms CLI.
- */
-
 export interface Profile {
   readonly domain: string
   readonly email: string
-  readonly password: string
+  readonly token: string
 }
 
 export interface Config {
