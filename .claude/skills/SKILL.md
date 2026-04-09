@@ -14,13 +14,13 @@ allowed-tools:
 
 Manage content on any Payload CMS instance directly from the terminal.
 
-Requires the `pcms` CLI: `npm install -g pcms-cli`
+Requires the `pcms` CLI: `npm install -g @mirkobozzetto/pcms-cli`
 Source and docs: https://github.com/mirkobozzetto/pcms-cli
 
 ## Prerequisites
 
-- `pcms` installed globally (`npm install -g pcms-cli`)
-- Authenticated: `pcms auth login --domain https://your-site.com --email admin@site.com`
+- `pcms` installed globally (`npm install -g @mirkobozzetto/pcms-cli`)
+- Authenticated: `pcms auth login --domain https://your-site.com`
 
 ## Context
 
@@ -57,18 +57,16 @@ When the user's intent is ambiguous, ask before executing.
 ### Install
 
 ```bash
-npm install -g pcms-cli
-# or
-pnpm add -g pcms-cli
+npm install -g @mirkobozzetto/pcms-cli
 ```
 
 ### Authenticate
 
 ```bash
-pcms auth login --domain https://your-payload-instance.com --email admin@example.com
+pcms auth login --domain https://your-payload-instance.com
 ```
 
-Password is prompted interactively. Credentials stored in `~/.config/pcms/credentials.json`.
+Email and password are prompted interactively. Credentials stored in `~/.config/pcms/credentials.json`.
 
 ### Verify
 
@@ -95,7 +93,10 @@ pcms collections count <collection> --where '<query>'
 # Documents
 pcms documents list <collection> --where '<query>' --sort '-createdAt' --limit 10
 pcms documents get <collection> <id>
+pcms documents list <collection> --draft  # include drafts
 pcms documents create <collection> --title "Title" --status draft
+pcms documents create <collection> --title "Title" --author 1 --category 3 --tags 5,8
+pcms documents create <collection> --title "Title" --image ./photo.jpg  # upload + link
 pcms documents create <collection> --md --input ./article.md
 pcms documents update <collection> <id> --title "New Title" --status published
 pcms documents delete <collection> <id> --force
@@ -112,6 +113,7 @@ pcms search "query" --limit 10
 
 # Import / Export
 pcms import ./article.md --collection posts --status draft
+pcms bulk-import ./posts-dir/ --collection posts --status draft
 pcms export <collection> <id> -f md -o ./output.md
 
 # Versions
@@ -132,7 +134,7 @@ pcms global:update <slug> --data '{"key": "value"}'
 4. **Markdown import** — for articles with rich content, prefer `pcms import` with a markdown file over `--title/--content` flags
 5. **Where clause** — use Payload's native syntax: `status[equals]=published`, `title[like]=keyword`
 6. **Parse output** — pcms returns JSON for list/get/search commands. Extract relevant fields for clean display
-7. **Batch operations** — when importing multiple files, loop with `for f in *.md; do pcms import "$f" --collection posts; done`
+7. **Batch operations** — use `pcms bulk-import ./directory/ --collection posts` instead of shell loops
 8. **Error handling** — if a command fails, read the error message carefully. Common issues: auth expired (re-login), missing required fields, invalid collection name
 
 ## Service-Specific References
