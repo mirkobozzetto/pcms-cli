@@ -46,9 +46,7 @@ ln -s /path/to/pcms-cli/.claude/skills ~/.claude/skills/pcms
 ## Install
 
 ```bash
-npm install -g pcms-cli
-# or
-pnpm add -g pcms-cli
+npm install -g @mirkobozzetto/pcms-cli
 ```
 
 From source:
