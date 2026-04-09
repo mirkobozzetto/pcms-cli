@@ -1,5 +1,6 @@
 import type { Command } from 'commander'
 import { readFileSync } from 'node:fs'
+import { basename } from 'node:path'
 import { markdownToLexical, parseFrontmatter } from '../lib/markdown.js'
 import { printError, printJson, printSuccess } from '../lib/output.js'
 import { promptText } from '../lib/prompt.js'
@@ -38,6 +39,7 @@ interface CreateOptions {
   author?: string
   category?: string
   tags?: string
+  image?: string
 }
 
 interface UpdateOptions {
@@ -53,6 +55,7 @@ interface UpdateOptions {
   author?: string
   category?: string
   tags?: string
+  image?: string
 }
 
 interface DeleteOptions {
@@ -157,6 +160,7 @@ export function registerDocumentCommands(program: Command): void {
     .option('--author <id>', 'Author user ID')
     .option('--category <id>', 'Category ID')
     .option('--tags <ids>', 'Comma-separated tag IDs')
+    .option('--image <path>', 'Upload and attach as featured image')
     .action(async (collection: string, opts: CreateOptions) => {
       try {
         const api = await resolveAPI(opts)
@@ -176,6 +180,11 @@ export function registerDocumentCommands(program: Command): void {
 
         const fieldData = buildDocumentData(opts)
         documentData = { ...documentData, ...fieldData }
+
+        if (opts.image) {
+          const uploaded = await api.upload(opts.image, { alt: opts.title ?? basename(opts.image) })
+          documentData['featuredImage'] = uploaded.doc.id
+        }
 
         const result = await api.create(collection, documentData, {
           locale: opts.locale,
@@ -204,6 +213,7 @@ export function registerDocumentCommands(program: Command): void {
     .option('--author <id>', 'Author user ID')
     .option('--category <id>', 'Category ID')
     .option('--tags <ids>', 'Comma-separated tag IDs')
+    .option('--image <path>', 'Upload and attach as featured image')
     .action(async (collection: string, id: string, opts: UpdateOptions) => {
       try {
         const api = await resolveAPI(opts)
@@ -215,6 +225,11 @@ export function registerDocumentCommands(program: Command): void {
 
         const fieldData = buildDocumentData(opts)
         documentData = { ...documentData, ...fieldData }
+
+        if (opts.image) {
+          const uploaded = await api.upload(opts.image, { alt: opts.title ?? basename(opts.image) })
+          documentData['featuredImage'] = uploaded.doc.id
+        }
 
         const result = await api.update(collection, id, documentData, {
           locale: opts.locale,

@@ -164,36 +164,31 @@ export class PayloadAPI {
     const filename = basename(filePath)
     const mimeType = mimeFromExt(extname(filename))
 
-    const boundary = `----FormBoundary${Date.now().toString(16)}`
-    const parts: Buffer[] = []
+    const boundary = `----WebKitFormBoundary${Math.random().toString(36).slice(2)}`
+    const lines: Buffer[] = []
 
-    const addField = (name: string, value: string): void => {
-      parts.push(
-        Buffer.from(
-          `--${boundary}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`,
-        ),
-      )
+    const altText = params?.alt || filename
+    const payload: Record<string, unknown> = { alt: altText }
+    lines.push(Buffer.from(`--${boundary}\r\n`))
+    lines.push(Buffer.from('Content-Disposition: form-data; name="_payload"\r\n\r\n'))
+    lines.push(Buffer.from(JSON.stringify(payload) + '\r\n'))
+
+    if (params?.locale) {
+      lines.push(Buffer.from(`--${boundary}\r\n`))
+      lines.push(Buffer.from('Content-Disposition: form-data; name="locale"\r\n\r\n'))
+      lines.push(Buffer.from(params.locale + '\r\n'))
     }
 
-    if (params?.alt) addField('alt', params.alt)
-    if (params?.locale) addField('locale', params.locale)
+    lines.push(Buffer.from(`--${boundary}\r\n`))
+    lines.push(Buffer.from(`Content-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: ${mimeType}\r\n\r\n`))
+    lines.push(fileBuffer)
+    lines.push(Buffer.from(`\r\n--${boundary}--\r\n`))
 
-    parts.push(
-      Buffer.from(
-        `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: ${mimeType}\r\n\r\n`,
-      ),
-    )
-    parts.push(fileBuffer)
-    parts.push(Buffer.from(`\r\n--${boundary}--\r\n`))
-
-    const body = Buffer.concat(parts)
+    const body = Buffer.concat(lines)
 
     return this.request<PayloadUploadResponse>('/api/media', {
       method: 'POST',
-      headers: {
-        'Content-Type': `multipart/form-data; boundary=${boundary}`,
-        'Content-Length': String(body.length),
-      },
+      headers: { 'Content-Type': `multipart/form-data; boundary=${boundary}` },
       body,
     })
   }
