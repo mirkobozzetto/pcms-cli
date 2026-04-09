@@ -66,11 +66,11 @@ describe('markdownToLexical', () => {
     const levels = [2, 3, 4, 5, 6] as const
     for (const level of levels) {
       const hashes = '#'.repeat(level)
-      const doc = markdownToLexical(`${hashes} Heading ${level}`)
+      const doc = markdownToLexical(`${hashes} Heading ${String(level)}`)
       const node = doc.root.children[0]
       expect(node?.type).toBe('heading')
       if (node?.type === 'heading') {
-        expect(node.tag).toBe(`h${level}`)
+        expect(node.tag).toBe(`h${String(level)}`)
       }
     }
   })

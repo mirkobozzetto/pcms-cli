@@ -327,7 +327,7 @@ function inlineNodeToMarkdown(node: LexicalInlineNode): string {
     return `[${linkText}](${node.fields.url})`
   }
 
-  if (node.type === 'code-highlight') {
+  if ((node.type as string) === 'code-highlight') {
     return node.text
   }
 
@@ -358,7 +358,7 @@ function blockNodeToMarkdown(node: LexicalBlockNode): string {
         .map((item, index) => {
           const innerText = item.children.map(blockNodeToMarkdown).join('')
           if (node.listType === 'bullet') return `- ${innerText}`
-          return `${item.value > 0 ? item.value : index + 1}. ${innerText}`
+          return `${String(item.value > 0 ? item.value : index + 1)}. ${innerText}`
         })
         .join('\n')
     }

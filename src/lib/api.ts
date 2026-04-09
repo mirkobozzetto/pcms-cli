@@ -180,7 +180,11 @@ export class PayloadAPI {
     }
 
     lines.push(Buffer.from(`--${boundary}\r\n`))
-    lines.push(Buffer.from(`Content-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: ${mimeType}\r\n\r\n`))
+    lines.push(
+      Buffer.from(
+        `Content-Disposition: form-data; name="file"; filename="${filename}"\r\nContent-Type: ${mimeType}\r\n\r\n`,
+      ),
+    )
     lines.push(fileBuffer)
     lines.push(Buffer.from(`\r\n--${boundary}--\r\n`))
 

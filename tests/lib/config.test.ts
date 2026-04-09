@@ -15,7 +15,7 @@ import {
 let testDir: string
 
 vi.mock('node:os', async () => {
-  const actual = await vi.importActual<typeof import('node:os')>('node:os')
+  const actual = await vi.importActual('node:os')
   return {
     ...actual,
     homedir: (): string => testDir,

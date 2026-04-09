@@ -54,7 +54,7 @@ export async function promptHidden(question: string): Promise<string> {
       process.stdin.resume()
       process.stdin.on('data', onData)
     } catch (err) {
-      reject(err)
+      reject(err instanceof Error ? err : new Error(String(err)))
     }
   })
 }

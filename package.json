@@ -1,6 +1,6 @@
 {
-  "name": "pcms-cli",
-  "version": "1.0.0",
+  "name": "@mirkobozzetto/pcms-cli",
+  "version": "1.7.0",
   "description": "Payload CMS CLI — Type-safe REST API client for Payload CMS",
   "type": "module",
   "bin": {
@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
-    "prepublishOnly": "pnpm check && pnpm build"
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
   },
   "engines": {
     "node": ">=18"
@@ -43,6 +43,7 @@
     "commander": "^14.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.5.2",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",

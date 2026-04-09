@@ -9,7 +9,14 @@ export default [
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: [
+            'tests/commands/documents.test.ts',
+            'tests/lib/api.test.ts',
+            'tests/lib/config.test.ts',
+            'tests/lib/markdown.test.ts',
+          ],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
