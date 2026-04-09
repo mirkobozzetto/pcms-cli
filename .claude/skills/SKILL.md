@@ -136,6 +136,12 @@ pcms global:update <slug> --data '{"key": "value"}'
 6. **Parse output** — pcms returns JSON for list/get/search commands. Extract relevant fields for clean display
 7. **Batch operations** — use `pcms bulk-import ./directory/ --collection posts` instead of shell loops
 8. **Error handling** — if a command fails, read the error message carefully. Common issues: auth expired (re-login), missing required fields, invalid collection name
+9. **Lexical content with links** — the CLI's `markdownToLexical()` generates link nodes that may cause Lexical error #117 on some Payload versions. When creating content with links via `--data`, use this link node format:
+   ```json
+   {"type":"link","version":3,"format":"","indent":0,"direction":"ltr","fields":{"url":"https://...","linkType":"custom","newTab":true},"children":[{"mode":"normal","text":"link text","type":"text","format":0}]}
+   ```
+   For complex articles with many links, build the Lexical JSON via a Node.js script rather than using `--md` or `--content`.
+10. **`_status` field** — Payload uses `_status` (with underscore) for the draft/publish system, not `status`. The CLI maps `--status` to `_status` automatically since v1.7.0.
 
 ## Service-Specific References
 
