@@ -1,5 +1,7 @@
 import type { Command } from 'commander'
 import * as fs from 'node:fs'
+import { basename, join } from 'node:path'
+import type { PayloadAPI } from '../lib/api.js'
 import { lexicalToMarkdown, markdownToLexical, parseFrontmatter } from '../lib/markdown.js'
 import { printError, printSuccess } from '../lib/output.js'
 import type { PayloadDocument } from '../types/api.js'
@@ -21,6 +23,42 @@ interface ImportOptions {
   status?: string
   locale?: string
   domain?: string
+}
+
+interface BulkImportOptions {
+  collection: string
+  status?: string
+  locale?: string
+  domain?: string
+}
+
+async function importSingleFile(
+  filePath: string,
+  collection: string,
+  api: PayloadAPI,
+  statusOverride?: string,
+  locale?: string,
+): Promise<{ id: number | string; title: string }> {
+  const raw = fs.readFileSync(filePath, 'utf-8')
+  const { meta, body } = parseFrontmatter(raw)
+  const lexicalBody = markdownToLexical(body)
+
+  const data: Record<string, unknown> = {
+    ...meta,
+    content: lexicalBody,
+  }
+
+  if (statusOverride !== undefined) {
+    data['_status'] = statusOverride
+  } else if (meta['status'] !== undefined) {
+    data['_status'] = meta['status']
+  }
+
+  const params: { locale?: string } = {}
+  if (locale !== undefined) params.locale = locale
+
+  const result = await api.create(collection, data, params)
+  return { id: result.doc.id, title: String(data['title'] ?? '') }
 }
 
 function buildMarkdownOutput(doc: PayloadDocument): string {
@@ -110,29 +148,60 @@ export function registerExportImportCommands(program: Command): void {
           throw new Error('Collection is required (--collection option)')
         }
 
-        const raw = fs.readFileSync(file, 'utf-8')
-        const { meta, body } = parseFrontmatter(raw)
-
-        const lexicalBody = markdownToLexical(body)
-
-        const data: Record<string, unknown> = {
-          ...meta,
-          content: lexicalBody,
-        }
-
-        if (opts.status !== undefined) {
-          data['_status'] = opts.status
-        } else if (meta['status'] !== undefined) {
-          data['_status'] = meta['status']
-        }
-
         const api = await resolveAPI(opts)
+        const result = await importSingleFile(file, collection, api, opts.status, opts.locale)
+        printSuccess(`Document successfully imported to "${collection}" (id: ${result.id})`)
+      } catch (err) {
+        printError(err instanceof Error ? err.message : String(err))
+        process.exit(1)
+      }
+    })
 
-        const params: { locale?: string } = {}
-        if (opts.locale !== undefined) params.locale = opts.locale
+  program
+    .command('bulk-import <directory>')
+    .description('Import all Markdown files from a directory')
+    .requiredOption('-c, --collection <collection>', 'Target collection')
+    .option('-s, --status <status>', 'Status override for all documents')
+    .option('--locale <locale>', 'Document locale')
+    .option('-d, --domain <domain>', 'Payload CMS domain URL')
+    .action(async (directory: string, opts: BulkImportOptions) => {
+      try {
+        const api = await resolveAPI(opts)
+        const files = fs
+          .readdirSync(directory)
+          .filter((f) => f.endsWith('.md'))
+          .map((f) => join(directory, f))
 
-        const result = await api.create(collection, data, params)
-        printSuccess(`Document successfully imported to "${collection}" (id: ${result.doc.id})`)
+        if (files.length === 0) {
+          console.error('No .md files found in', directory)
+          return
+        }
+
+        console.log(`Importing ${files.length} files into ${opts.collection}...`)
+
+        let success = 0
+        let failed = 0
+
+        for (const file of files) {
+          try {
+            const result = await importSingleFile(
+              file,
+              opts.collection,
+              api,
+              opts.status,
+              opts.locale,
+            )
+            console.log(`  OK ${basename(file)} -> ID ${result.id}`)
+            success++
+          } catch (err) {
+            console.error(
+              `  FAIL ${basename(file)}: ${err instanceof Error ? err.message : String(err)}`,
+            )
+            failed++
+          }
+        }
+
+        console.log(`\nDone: ${success} imported, ${failed} failed`)
       } catch (err) {
         printError(err instanceof Error ? err.message : String(err))
         process.exit(1)
