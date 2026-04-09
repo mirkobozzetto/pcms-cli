@@ -35,6 +35,9 @@ interface CreateOptions {
   excerpt?: string
   locale?: string
   depth?: string
+  author?: string
+  category?: string
+  tags?: string
 }
 
 interface UpdateOptions {
@@ -47,6 +50,9 @@ interface UpdateOptions {
   excerpt?: string
   locale?: string
   depth?: string
+  author?: string
+  category?: string
+  tags?: string
 }
 
 interface DeleteOptions {
@@ -71,6 +77,10 @@ function buildDocumentData(opts: CreateOptions | UpdateOptions): Record<string, 
   if (opts.content !== undefined) {
     data['content'] = markdownToLexical(opts.content)
   }
+
+  if (opts.author !== undefined) data['author'] = Number(opts.author)
+  if (opts.category !== undefined) data['category'] = Number(opts.category)
+  if (opts.tags !== undefined) data['tags'] = opts.tags.split(',').map(Number)
 
   return data
 }
@@ -144,6 +154,9 @@ export function registerDocumentCommands(program: Command): void {
     .option('--excerpt <excerpt>', 'Document excerpt')
     .option('--locale <locale>', 'Locale code')
     .option('--depth <depth>', 'Relation resolution depth')
+    .option('--author <id>', 'Author user ID')
+    .option('--category <id>', 'Category ID')
+    .option('--tags <ids>', 'Comma-separated tag IDs')
     .action(async (collection: string, opts: CreateOptions) => {
       try {
         const api = await resolveAPI(opts)
@@ -188,6 +201,9 @@ export function registerDocumentCommands(program: Command): void {
     .option('--excerpt <excerpt>', 'New excerpt')
     .option('--locale <locale>', 'Locale code')
     .option('--depth <depth>', 'Relation resolution depth')
+    .option('--author <id>', 'Author user ID')
+    .option('--category <id>', 'Category ID')
+    .option('--tags <ids>', 'Comma-separated tag IDs')
     .action(async (collection: string, id: string, opts: UpdateOptions) => {
       try {
         const api = await resolveAPI(opts)
