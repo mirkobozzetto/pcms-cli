@@ -126,11 +126,13 @@ export interface FindParams {
   readonly page?: number | undefined
   readonly depth?: number | undefined
   readonly locale?: string | undefined
+  readonly draft?: boolean | undefined
 }
 
 export interface FindByIDParams {
   readonly depth?: number | undefined
   readonly locale?: string | undefined
+  readonly draft?: boolean | undefined
 }
 
 export interface MutationParams {

@@ -13,12 +13,14 @@ interface ListOptions {
   page?: string
   depth?: string
   locale?: string
+  draft?: boolean
 }
 
 interface GetOptions {
   domain?: string
   depth?: string
   locale?: string
+  draft?: boolean
 }
 
 interface CreateOptions {
@@ -86,6 +88,7 @@ export function registerDocumentCommands(program: Command): void {
     .option('--page <page>', 'Page number')
     .option('--depth <depth>', 'Relation resolution depth')
     .option('--locale <locale>', 'Locale code')
+    .option('--draft', 'Include draft documents')
     .action(async (collection: string, opts: ListOptions) => {
       try {
         const api = await resolveAPI(opts)
@@ -96,6 +99,7 @@ export function registerDocumentCommands(program: Command): void {
           page: parseIntOption(opts.page),
           depth: parseIntOption(opts.depth),
           locale: opts.locale,
+          draft: opts.draft,
         })
         printJson(result)
       } catch (err) {
@@ -110,12 +114,14 @@ export function registerDocumentCommands(program: Command): void {
     .option('-d, --domain <domain>', 'Payload CMS domain URL')
     .option('--depth <depth>', 'Relation resolution depth')
     .option('--locale <locale>', 'Locale code')
+    .option('--draft', 'Include draft version')
     .action(async (collection: string, id: string, opts: GetOptions) => {
       try {
         const api = await resolveAPI(opts)
         const result = await api.findByID(collection, id, {
           depth: parseIntOption(opts.depth),
           locale: opts.locale,
+          draft: opts.draft,
         })
         printJson(result)
       } catch (err) {

@@ -61,9 +61,9 @@ export class PayloadAPI {
     return res.json() as Promise<T>
   }
 
-  private buildQuery(params: Record<string, string | number | undefined>): string {
+  private buildQuery(params: Record<string, string | number | boolean | undefined>): string {
     const entries = Object.entries(params).filter(
-      (entry): entry is [string, string | number] => entry[1] !== undefined,
+      (entry): entry is [string, string | number | boolean] => entry[1] !== undefined,
     )
     if (entries.length === 0) return ''
     const qs = entries
@@ -101,7 +101,7 @@ export class PayloadAPI {
 
   async find(collection: string, params?: FindParams): Promise<PayloadPaginatedResponse> {
     const query = params
-      ? this.buildQuery(params as Record<string, string | number | undefined>)
+      ? this.buildQuery(params as Record<string, string | number | boolean | undefined>)
       : ''
     return this.request<PayloadPaginatedResponse>(`/api/${collection}${query}`)
   }
@@ -112,7 +112,7 @@ export class PayloadAPI {
     params?: FindByIDParams,
   ): Promise<PayloadDocument> {
     const query = params
-      ? this.buildQuery(params as Record<string, string | number | undefined>)
+      ? this.buildQuery(params as Record<string, string | number | boolean | undefined>)
       : ''
     return this.request<PayloadDocument>(`/api/${collection}/${id}${query}`)
   }
