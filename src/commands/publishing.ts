@@ -20,7 +20,7 @@ export function registerPublishingCommands(program: Command): void {
   program
     .command('publish <collection> <id>')
     .description('Publish a document in a collection')
-    .option('--status-field <field>', 'Status field to update', 'status')
+    .option('--status-field <field>', 'Status field to update', '_status')
     .option('--value <value>', 'Published status value', 'published')
     .option('--locale <locale>', 'Document locale')
     .option('--domain <domain>', 'Profile domain to use')
@@ -40,7 +40,7 @@ export function registerPublishingCommands(program: Command): void {
   program
     .command('unpublish <collection> <id>')
     .description('Unpublish a document in a collection')
-    .option('--status-field <field>', 'Status field to update', 'status')
+    .option('--status-field <field>', 'Status field to update', '_status')
     .option('--value <value>', 'Unpublished status value', 'draft')
     .option('--locale <locale>', 'Document locale')
     .option('--domain <domain>', 'Profile domain to use')

@@ -27,7 +27,7 @@ function buildMarkdownOutput(doc: PayloadDocument): string {
   const title = typeof doc['title'] === 'string' ? doc['title'] : ''
   const slug = typeof doc['slug'] === 'string' ? doc['slug'] : ''
   const excerpt = typeof doc['excerpt'] === 'string' ? doc['excerpt'] : ''
-  const status = typeof doc['status'] === 'string' ? doc['status'] : ''
+  const status = typeof doc['_status'] === 'string' ? doc['_status'] : ''
   const publishedAt = typeof doc['publishedAt'] === 'string' ? doc['publishedAt'] : ''
   const createdAt = typeof doc['createdAt'] === 'string' ? doc['createdAt'] : ''
 
@@ -121,9 +121,9 @@ export function registerExportImportCommands(program: Command): void {
         }
 
         if (opts.status !== undefined) {
-          data['status'] = opts.status
+          data['_status'] = opts.status
         } else if (meta['status'] !== undefined) {
-          data['status'] = meta['status']
+          data['_status'] = meta['status']
         }
 
         const api = await resolveAPI(opts)

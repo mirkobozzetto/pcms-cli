@@ -62,7 +62,7 @@ function buildDocumentData(opts: CreateOptions | UpdateOptions): Record<string, 
   const data: Record<string, unknown> = {}
 
   if (opts.title !== undefined) data['title'] = opts.title
-  if (opts.status !== undefined) data['status'] = opts.status
+  if (opts.status !== undefined) data['_status'] = opts.status
   if (opts.slug !== undefined) data['slug'] = opts.slug
   if (opts.excerpt !== undefined) data['excerpt'] = opts.excerpt
 
